@@ -81,7 +81,7 @@ export default function Admin() {
     )
 
   return (
-    <main>
+    <main className="wrap">
       <div className="bar">
         <h2>Administration</h2>
         <span><Link to="/">Site</Link> <button onClick={() => supabase.auth.signOut()}>Déconnexion</button></span>

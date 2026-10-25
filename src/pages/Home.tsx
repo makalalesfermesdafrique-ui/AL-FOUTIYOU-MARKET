@@ -1,81 +1,86 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Category, Listing, WHATSAPP, configured, fcfa, supabase } from '../lib/supabase'
+import Layout from '../components/Layout'
+import ListingCard from '../components/ListingCard'
+import { Category, Listing, configured, supabase } from '../lib/supabase'
+import { useSettings, waLink } from '../lib/settings'
+
+const CARDS = [
+  { slug: 'terrains', icon: '🌍', t: 'Terrains', p: 'Découvrez des opportunités foncières.', b: 'Voir les terrains' },
+  { slug: 'immobilier', icon: '🏠', t: 'Immobilier', p: 'Maisons, appartements, villas et locaux commerciaux.', b: 'Voir les biens immobiliers' },
+  { slug: 'automobiles', icon: '🚗', t: 'Automobiles', p: 'Découvrez les véhicules disponibles.', b: 'Voir les voitures' },
+  { slug: 'motos', icon: '🏍️', t: 'Motos et autres véhicules', p: 'Explorez les motos et autres véhicules.', b: 'Voir les véhicules' },
+]
 
 export default function Home() {
+  const s = useSettings()
   const [cats, setCats] = useState<Category[]>([])
   const [items, setItems] = useState<Listing[]>([])
-  const [cat, setCat] = useState<number | null>(null)
-  const [q, setQ] = useState('')
-  const [sel, setSel] = useState<Listing | null>(null)
-  const [err, setErr] = useState('')
-  const [sent, setSent] = useState(false)
-
-  useEffect(() => {
-    supabase.from('categories').select('*').order('id').then(({ data }) => setCats(data ?? []))
-    supabase.from('public_listings').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-      if (error) setErr(error.message)
-      setItems(data ?? [])
-    })
-  }, [])
-
-  const shown = items.filter(
-    (i) => (!cat || i.category_id === cat) && (i.title + ' ' + (i.city ?? '')).toLowerCase().includes(q.toLowerCase()),
-  )
-
-  async function send(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const f = new FormData(e.currentTarget)
-    const { error } = await supabase.from('customer_leads').insert({
-      listing_id: sel?.id, name: f.get('name'), phone: f.get('phone'), message: f.get('message'),
-    })
-    if (error) setErr(error.message)
-    else { setSent(true); setSel(null) }
+  const [state, setState] = useState<'load' | 'ok' | 'err'>('load')
+  const load = () => {
+    setState('load')
+    supabase.from('categories').select('*').then(({ data }) => setCats(data ?? []))
+    supabase.from('public_listings').select('*').order('published_at', { ascending: false }).limit(6)
+      .then(({ data, error }) => { if (error) setState('err'); else { setItems(data ?? []); setState('ok') } })
   }
+  useEffect(load, [])
+  const wa = waLink(s.whatsapp, 'Bonjour, je souhaite proposer un bien. ')
 
   return (
-    <>
-      <header className="hero">
-        <h1>AL FOUTIYOU MARKET</h1>
-        <p>Les bonnes opportunités, au bon endroit</p>
-        <input placeholder="Rechercher (titre, ville)…" value={q} onChange={(e) => setQ(e.target.value)} />
-      </header>
-      <main>
-        {!configured && <p className="warn">Supabase n'est pas configuré (secrets GitHub manquants).</p>}
-        {err && <p className="warn">{err}</p>}
-        {sent && <p className="ok">Merci ! Nous vous recontactons très vite.</p>}
-        <div className="chips">
-          <button className={!cat ? 'on' : ''} onClick={() => setCat(null)}>Tout</button>
-          {cats.map((c) => (
-            <button key={c.id} className={cat === c.id ? 'on' : ''} onClick={() => setCat(c.id)}>{c.name}</button>
+    <Layout>
+      <section className="hero">
+        <div className="wrap">
+          <h1>Trouvez votre prochain bien avec AL FOUTIYOU MARKET</h1>
+          <p>Terrains, maisons et véhicules : découvrez les opportunités et contactez notre équipe pour organiser votre visite.</p>
+          <div className="row2">
+            <Link className="btn act" to="/annonces">Explorer les annonces</Link>
+            <a className="btn light" href="#contact">Proposer un bien</a>
+          </div>
+        </div>
+      </section>
+      <main className="wrap">
+        {!configured && <p className="warn">Le site n'est pas encore relié à Supabase.</p>}
+        <div className="cats">
+          {CARDS.map((c) => (
+            <Link key={c.slug} to={`/annonces?cat=${c.slug}`} className="cat">
+              <span className="ic">{c.icon}</span><h3>{c.t}</h3><p>{c.p}</p><span className="lnk">{c.b}</span>
+            </Link>
           ))}
         </div>
-        <div className="grid">
-          {shown.map((l) => (
-            <article key={l.id} className="card">
-              {l.image_url && <img src={l.image_url} alt={l.title} />}
-              <h3>{l.title}</h3>
-              <p>{l.description}</p>
-              <p className="price">{fcfa(l.price)} {l.city && <small>· {l.city}</small>}</p>
-              <button onClick={() => { setSel(l); setSent(false) }}>Je suis intéressé</button>
-              <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Bonjour, je suis intéressé par : ' + l.title)}`} target="_blank" rel="noreferrer">WhatsApp</a>
-            </article>
-          ))}
-          {!shown.length && <p>Aucune annonce pour le moment.</p>}
+        <h2 className="sec">Les dernières annonces publiées</h2>
+        {state === 'load' && <p className="mut">Chargement des annonces…</p>}
+        {state === 'err' && <p className="warn">Impossible de charger les annonces. <button className="btn ghost" onClick={load}>Réessayer</button></p>}
+        {state === 'ok' && !items.length && (
+          <div className="empty"><h3>Les premières annonces arrivent bientôt</h3>
+            <p>Vous avez un terrain, une maison ou un véhicule à vendre ? Contactez AL FOUTIYOU MARKET pour le proposer.</p></div>
+        )}
+        <div className="grid">{items.map((l) => <ListingCard key={l.id} l={l} cat={cats.find((c) => c.id === l.category_id)} />)}</div>
+        {!!items.length && <p className="center"><Link className="btn" to="/annonces">Voir toutes les annonces</Link></p>}
+
+        <h2 className="sec">Pourquoi choisir AL FOUTIYOU MARKET ?</h2>
+        <div className="three">
+          <div><h3>Mise en relation de confiance</h3><p>Notre équipe examine chaque bien avant publication.</p></div>
+          <div><h3>Un seul interlocuteur</h3><p>Vous nous contactez, nous organisons la visite avec le propriétaire.</p></div>
+          <div><h3>Simple depuis votre téléphone</h3><p>Consultez, filtrez et écrivez-nous sans créer de compte.</p></div>
         </div>
+        <h2 className="sec">Comment fonctionne notre service ?</h2>
+        <ol className="steps">
+          <li>Vous parcourez les annonces publiées.</li>
+          <li>Vous nous envoyez une demande de renseignements.</li>
+          <li>Nous vous recontactons et organisons la visite.</li>
+          <li>Nous facilitons les échanges jusqu'à la vente.</li>
+        </ol>
+        <section id="contact" className="cta">
+          <h2>Contacter AL FOUTIYOU MARKET</h2>
+          <p>Pour proposer un bien ou obtenir un renseignement.</p>
+          <div className="row2">
+            {wa && <a className="btn act" href={wa} target="_blank" rel="noreferrer">💬 Écrire sur WhatsApp</a>}
+            {s.phone && <a className="btn light" href={`tel:${s.phone}`}>📞 {s.phone}</a>}
+            {s.email && <a className="btn light" href={`mailto:${s.email}`}>✉️ {s.email}</a>}
+            {!wa && !s.phone && !s.email && <p>Les coordonnées seront bientôt disponibles.</p>}
+          </div>
+        </section>
       </main>
-      {sel && (
-        <div className="modal" onClick={() => setSel(null)}>
-          <form onClick={(e) => e.stopPropagation()} onSubmit={send}>
-            <h3>{sel.title}</h3>
-            <input name="name" placeholder="Votre nom" required />
-            <input name="phone" placeholder="Téléphone" required />
-            <textarea name="message" placeholder="Message (facultatif)" />
-            <button>Envoyer</button>
-          </form>
-        </div>
-      )}
-      <footer><Link to="/admin">Espace administrateur</Link></footer>
-    </>
+    </Layout>
   )
 }
