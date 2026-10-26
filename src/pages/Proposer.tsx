@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import { supabase } from '../lib/supabase'
+import Photos, { Item } from '../components/Photos'
+import { sha256, uid, upload } from '../lib/images'
 
 type Info = { category_id: number; slug: string; name: string }
 const X: Record<string, [string, string][]> = {
@@ -9,7 +11,7 @@ const X: Record<string, [string, string][]> = {
   automobiles: [['marque', 'Marque'], ['modele', 'Modèle'], ['annee', 'Année'], ['kilometrage', 'Kilométrage'], ['carburant', 'Carburant'], ['boite', 'Boîte de vitesses'], ['etat', 'État général']],
   motos: [['marque', 'Marque'], ['modele', 'Modèle'], ['cylindree', 'Cylindrée'], ['annee', 'Année'], ['kilometrage', 'Kilométrage'], ['etat', 'État général']],
 }
-const STEPS = ['Propriétaire', 'Le bien', 'Vérification']
+const STEPS = ['Propriétaire', 'Le bien', 'Photos', 'Vérification']
 
 export default function Proposer({ token }: { token: string }) {
   const [info, setInfo] = useState<Info | null | undefined>(undefined)
@@ -19,6 +21,7 @@ export default function Proposer({ token }: { token: string }) {
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
+  const [items, setItems] = useState<Item[]>([])
 
   useEffect(() => { supabase.rpc('get_form_link', { p_token: token }).then(({ data, error }) => setInfo(error ? null : (data as Info | null))) }, [token])
   const on = (k: string) => (e: any) => setV({ ...v, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
@@ -30,14 +33,19 @@ export default function Proposer({ token }: { token: string }) {
       if (!v.city?.trim()) return 'Indiquez la ville du bien.'
     }
     if (step === 1 && !v.title?.trim()) return "Donnez un titre à l'annonce."
-    if (step === 2 && !v.consent) return 'Vous devez accepter d’être contacté par AL FOUTIYOU MARKET.'
+    if (step === 3 && !v.consent) return 'Vous devez accepter d’être contacté par AL FOUTIYOU MARKET.'
     return ''
   }
   const next = () => { const m = check(); setErr(m); if (!m) setStep(step + 1) }
   async function send() {
     const m = check(); setErr(m); if (m) return
     setBusy(true)
-    const { error } = await supabase.rpc('submit_owner_proposal', { p_token: token, p: { ...v, form_data: Object.fromEntries(Object.entries(fd).filter(([, x]) => x)) } })
+    const photos: string[] = []
+    try {
+      const h = await sha256(token)
+      for (const it of items) { const path = `${h}/${uid()}.${it.proc!.ext}`; await upload('submission-photos', path, it.proc!.full); photos.push(path) }
+    } catch (e: any) { setBusy(false); return setErr(e.message) }
+    const { error } = await supabase.rpc('submit_owner_proposal', { p_token: token, p: { ...v, photos, form_data: Object.fromEntries(Object.entries(fd).filter(([, x]) => x)) } })
     setBusy(false)
     if (error) setErr(error.message || "Envoi impossible. Vérifiez votre connexion et réessayez.")
     else setDone(true)
@@ -68,8 +76,14 @@ export default function Proposer({ token }: { token: string }) {
             {(X[info.slug] ?? []).map(([k, l]) => <label key={k}>{l}<input value={fd[k] ?? ''} onChange={(e) => setFd({ ...fd, [k]: e.target.value })} /></label>)}
           </>}
           {step === 2 && <>
+            <h3>Photos du bien</h3>
+            <p className="mut">Ajoutez de bonnes photos (façade, intérieur, plaque et tableau de bord pour un véhicule…). Elles sont facultatives mais augmentent vos chances de vente.</p>
+            <Photos items={items} setItems={setItems} />
+          </>}
+          {step === 3 && <>
             <h3>Vérifiez vos informations</h3>
             <p><b>{v.owner_name}</b> · {v.owner_phone}{v.owner_email && ` · ${v.owner_email}`}<br />{[v.city, v.region].filter(Boolean).join(', ')}</p>
+            <p>{items.length} photo(s) ajoutée(s)</p>
             <p><b>{v.title}</b>{v.price && ` · ${Number(v.price).toLocaleString('fr-FR')} FCFA`}{v.price_negotiable && ' (négociable)'}</p>
             {Object.entries(fd).filter(([, x]) => x).map(([k, x]) => <p key={k} className="mut">{k.replace(/_/g, ' ')} : {x}</p>)}
             <label className="chk"><input type="checkbox" checked={v.consent} onChange={on('consent')} /> J'accepte d'être contacté par AL FOUTIYOU MARKET au sujet de ce bien.</label>
@@ -78,7 +92,7 @@ export default function Proposer({ token }: { token: string }) {
           {err && <p className="warn">{err}</p>}
           <div className="row2">
             {step > 0 && <button className="ghost" onClick={() => { setErr(''); setStep(step - 1) }}>Retour</button>}
-            {step < 2 ? <button className="btn act" onClick={next}>Continuer</button> : <button className="btn act" disabled={busy} onClick={send}>{busy ? 'Envoi…' : 'Envoyer ma proposition'}</button>}
+            {step < 3 ? <button className="btn act" onClick={next}>Continuer</button> : <button className="btn act" disabled={busy} onClick={send}>{busy ? 'Envoi…' : 'Envoyer ma proposition'}</button>}
           </div>
         </div>
       </main>

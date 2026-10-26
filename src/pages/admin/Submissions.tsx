@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fcfa, supabase } from '../../lib/supabase'
 import { waLink } from '../../lib/settings'
+import { pubUrl, uid, upload } from '../../lib/images'
 
 const SS: Record<string, string> = { new: 'Nouvelle', in_review: "En cours d'examen", info_requested: 'Informations demandées', contacted: 'Propriétaire contacté', validated: 'Validée pour publication', refused: 'Refusée', converted: 'Convertie en annonce' }
 export default function Submissions() {
@@ -9,15 +10,28 @@ export default function Submissions() {
   const [rows, setRows] = useState<any[]>([])
   const [f, setF] = useState('')
   const [msg, setMsg] = useState('')
-  const load = () => supabase.from('owner_submissions').select('*').order('created_at', { ascending: false }).then(({ data, error }) => { if (error) setMsg(error.message); else setRows(data ?? []) })
+  const [urls, setUrls] = useState<Record<string, string>>({})
+  const load = () => supabase.from('owner_submissions').select('*').order('created_at', { ascending: false }).then(async ({ data, error }) => { if (error) return setMsg(error.message); setRows(data ?? []); const all = (data ?? []).flatMap((r: any) => r.photos ?? []); if (all.length) { const { data: sg } = await supabase.storage.from('submission-photos').createSignedUrls(all, 3600); const m: Record<string, string> = {}; (sg ?? []).forEach((x: any) => { if (x.path && x.signedUrl) m[x.path] = x.signedUrl }); setUrls(m) } })
   useEffect(() => { load() }, [])
   async function up(id: string, patch: object) {
     const { error } = await supabase.from('owner_submissions').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id)
     setMsg(error ? 'Mise à jour impossible : ' + error.message : 'Enregistré.'); if (!error) load()
   }
   async function convert(id: string) {
-    const { error } = await supabase.rpc('convert_submission', { p_id: id })
+    const { data: lid, error } = await supabase.rpc('convert_submission', { p_id: id })
     if (error) return setMsg('Conversion impossible : ' + error.message)
+    try {
+      const sub: any = rows.find((r) => r.id === id); let first = ''
+      for (let i = 0; i < (sub?.photos ?? []).length; i++) {
+        const src = sub.photos[i]; const dl = await supabase.storage.from('submission-photos').download(src)
+        if (dl.error) throw dl.error
+        const ext = src.endsWith('.jpg') ? 'jpg' : 'webp'; const dst = `${lid}/${uid()}.${ext}`
+        await upload('listing-images', dst, dl.data)
+        await supabase.from('listing_images').insert({ listing_id: lid, storage_path: dst, thumbnail_path: dst, sort_order: i, is_primary: i === 0 })
+        if (i === 0) first = dst
+      }
+      if (first) await supabase.from('listings').update({ image_url: pubUrl(first) }).eq('id', lid)
+    } catch (e: any) { setMsg("L'annonce est créée, mais les photos n'ont pas pu être copiées : " + e.message); return }
     nav('/admin/annonces')
   }
   const shown = rows.filter((r) => !f || r.status === f)
@@ -31,6 +45,7 @@ export default function Submissions() {
           <div className="bar"><b>{r.title}</b><small>{new Date(r.created_at).toLocaleString('fr-FR')}</small></div>
           <p>👤 {r.owner_name} · 📞 <a href={`tel:${r.owner_phone}`}>{r.owner_phone}</a>{r.owner_email && ` · ✉️ ${r.owner_email}`}</p>
           <p>📍 {[r.city, r.region].filter(Boolean).join(', ')} · {fcfa(r.price)}{r.price_negotiable && ' (négociable)'}</p>
+          {!!r.photos?.length && <div className="thumbs">{r.photos.map((p: string) => urls[p] && <a key={p} href={urls[p]} target="_blank" rel="noreferrer"><img src={urls[p]} alt="Photo proposée" /></a>)}</div>}
           {r.description && <p className="msgbox">{r.description}</p>}
           {Object.entries(r.form_data ?? {}).map(([k, x]) => <p key={k} className="mut">{k.replace(/_/g, ' ')} : {String(x)}</p>)}
           <select aria-label="Statut" value={r.status} onChange={(e) => up(r.id, { status: e.target.value })}>{Object.entries(SS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>

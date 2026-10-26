@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import { ICON, Listing, fcfa, supabase } from '../lib/supabase'
+import { pubUrl } from '../lib/images'
 import { useSettings, waLink } from '../lib/settings'
 
 export default function Detail() {
@@ -12,6 +13,8 @@ export default function Detail() {
   const [state, setState] = useState<'load' | 'ok' | 'none' | 'err'>('load')
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null)
   const [busy, setBusy] = useState(false)
+  const [imgs, setImgs] = useState<string[]>([])
+  const [cur, setCur] = useState(0)
 
   useEffect(() => {
     supabase.from('public_listings').select('*').eq('id', id).maybeSingle().then(async ({ data, error }) => {
@@ -20,6 +23,8 @@ export default function Detail() {
       setL(data as Listing); setState('ok')
       const c = await supabase.from('categories').select('slug').eq('id', (data as Listing).category_id).maybeSingle()
       setSlug(c.data?.slug ?? '')
+      const im = await supabase.from('public_listing_images').select('storage_path,sort_order').eq('listing_id', id).order('sort_order')
+      setImgs((im.data ?? []).map((r: any) => pubUrl(r.storage_path)))
     })
   }, [id])
 
@@ -45,7 +50,10 @@ export default function Detail() {
     <Layout>
       <main className="wrap detail">
         <p><Link to="/annonces">← Toutes les annonces</Link></p>
-        <div className="ph big">{l.image_url ? <img src={l.image_url} alt={l.title} /> : <span>{ICON[slug] ?? '📦'}</span>}</div>
+        <div className="ph big">{(imgs[cur] ?? l.image_url) ? <img src={imgs[cur] ?? l.image_url!} alt={`${l.title} – photo ${cur + 1}`} /> : <span>{ICON[slug] ?? '📦'}</span>}
+          {imgs.length > 1 && <><button className="nv l" aria-label="Photo précédente" onClick={() => setCur((cur + imgs.length - 1) % imgs.length)}>◀</button><button className="nv r" aria-label="Photo suivante" onClick={() => setCur((cur + 1) % imgs.length)}>▶</button></>}
+        </div>
+        {imgs.length > 1 && <div className="strip">{imgs.map((u, i) => <img key={u} src={u} alt={`Miniature ${i + 1}`} className={i === cur ? 'on' : ''} onClick={() => setCur(i)} loading="lazy" />)}</div>}
         <h1>{l.title}</h1>
         <p className="loc">📍 {[l.city, l.region].filter(Boolean).join(', ') || 'Localité à préciser'}</p>
         <p className="price big">{fcfa(l.price)}{l.price_negotiable && l.price != null && <small> · négociable</small>}</p>

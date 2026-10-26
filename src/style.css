@@ -51,3 +51,7 @@ nav{gap:26px}nav a{font-size:1.05rem;font-weight:700;color:#0b1f18}nav a.active,
 .banner{background-size:cover;background-position:center;min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 16px}
 .banner h1{margin:0;font-size:clamp(2.4rem,9vw,5.2rem);font-weight:800;letter-spacing:.01em}
 @media(max-width:760px){.outline{-webkit-text-stroke:1.5px #fff}.nav{min-height:68px}}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}.thumbs figure{margin:0;position:relative}.thumbs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.thumbs .badge{top:6px;left:6px}.mv{display:flex;gap:4px;justify-content:center;margin-top:4px}.mv button{padding:4px 8px;font-size:.8rem}
+.ph.big{position:relative}.nv{position:absolute;top:50%;transform:translateY(-50%);background:#0f3d2ecc;padding:10px 14px}.nv.l{left:10px}.nv.r{right:10px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0}.strip img{width:84px;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;opacity:.7;flex:none}.strip img.on{opacity:1;outline:3px solid var(--gold)}
