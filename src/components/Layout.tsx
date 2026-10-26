@@ -2,6 +2,8 @@ import { ReactNode, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSettings, waLink } from '../lib/settings'
 
+const MSG = ['🌍 Terrains', '🏠 Maisons et villas', '🚗 Voitures', '🏍️ Motos', '📞 Contactez AL FOUTIYOU MARKET pour organiser votre visite', '✨ Les bonnes opportunités, au bon endroit']
+
 export default function Layout({ children }: { children: ReactNode }) {
   const s = useSettings()
   const [open, setOpen] = useState(false)
@@ -9,6 +11,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const close = () => setOpen(false)
   return (
     <>
+      <div className="ticker"><div className="track">{[...MSG, ...MSG].map((m, i) => <span key={i}>{m}</span>)}</div></div>
       <header className="top">
         <div className="wrap nav">
           <Link to="/" className="logo" onClick={close}>AL FOUTIYOU <b>MARKET</b></Link>
@@ -19,7 +22,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <Link to="/annonces?cat=terrains" onClick={close}>Terrains</Link>
             <Link to="/annonces?cat=immobilier" onClick={close}>Immobilier</Link>
             <Link to="/annonces?cat=automobiles" onClick={close}>Voitures</Link>
-            {wa && <a className="btn act" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
+            {wa && <a className="btn wa" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
           </nav>
         </div>
       </header>
@@ -34,6 +37,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <p><Link to="/admin">Espace administrateur</Link></p>
         </div>
       </footer>
+      {wa && <a className="fab" href={wa} target="_blank" rel="noreferrer" aria-label="Écrire sur WhatsApp">💬</a>}
     </>
   )
 }

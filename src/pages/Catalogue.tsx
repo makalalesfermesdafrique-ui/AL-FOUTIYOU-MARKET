@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import Bubbles from '../components/Bubbles'
 import Layout from '../components/Layout'
 import ListingCard from '../components/ListingCard'
 import { Category, Listing, supabase } from '../lib/supabase'
@@ -37,7 +38,7 @@ export default function Catalogue() {
   return (
     <Layout>
       <section className="banner" style={{ backgroundImage: `linear-gradient(rgba(6,28,21,.75),rgba(6,28,21,.88)), url(${import.meta.env.BASE_URL}hero.jpg), linear-gradient(135deg,#0f3d2e,#0a2a20)` }}>
-        <h1 className="outline">Nos annonces</h1>
+        <Bubbles /><h1 className="outline">Nos annonces</h1>
       </section>
       <main className="wrap">
         <div style={{ height: 18 }} />

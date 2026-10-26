@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Bubbles from '../components/Bubbles'
 import Layout from '../components/Layout'
 import ListingCard from '../components/ListingCard'
 import { Category, Listing, configured, supabase } from '../lib/supabase'
@@ -29,6 +30,7 @@ export default function Home() {
   return (
     <Layout>
       <section className="hero" style={{ backgroundImage: `linear-gradient(rgba(6,28,21,.72),rgba(6,28,21,.86)), url(${import.meta.env.BASE_URL}hero.jpg), linear-gradient(135deg,#0f3d2e,#0a2a20)` }}>
+        <Bubbles />
         <div className="wrap">
           <h1>Trouvez votre prochain bien avec <span className="outline">AL FOUTIYOU MARKET</span></h1>
           <p>Terrains, maisons et véhicules : découvrez les opportunités et contactez notre équipe pour organiser votre visite.</p>
@@ -70,11 +72,11 @@ export default function Home() {
           <li>Nous vous recontactons et organisons la visite.</li>
           <li>Nous facilitons les échanges jusqu'à la vente.</li>
         </ol>
-        <section id="contact" className="cta">
+        <section id="contact" className="cta"><Bubbles />
           <h2>Contacter AL FOUTIYOU MARKET</h2>
           <p>Pour proposer un bien ou obtenir un renseignement.</p>
           <div className="row2">
-            {wa && <a className="btn act" href={wa} target="_blank" rel="noreferrer">💬 Écrire sur WhatsApp</a>}
+            {wa && <a className="btn wa" href={wa} target="_blank" rel="noreferrer">💬 Écrire sur WhatsApp</a>}
             {s.phone && <a className="btn light" href={`tel:${s.phone}`}>📞 {s.phone}</a>}
             {s.email && <a className="btn light" href={`mailto:${s.email}`}>✉️ {s.email}</a>}
             {!wa && !s.phone && !s.email && <p>Les coordonnées seront bientôt disponibles.</p>}

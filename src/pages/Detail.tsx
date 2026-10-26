@@ -60,7 +60,7 @@ export default function Detail() {
         {l.published_at && <p className="mut">Publiée le {new Date(l.published_at).toLocaleDateString('fr-FR')}</p>}
         <p className="desc">{l.description || 'Aucune description détaillée pour le moment.'}</p>
         <div className="row2">
-          {wa && <a className="btn act" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
+          {wa && <a className="btn wa" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
           {navigator.share && <button className="btn ghost" onClick={() => navigator.share({ title: l.title, url: location.href })}>Partager</button>}
         </div>
         <form onSubmit={send} className="box">
