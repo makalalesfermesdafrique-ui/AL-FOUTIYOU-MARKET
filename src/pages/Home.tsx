@@ -7,6 +7,7 @@ import ListingCard from '../components/ListingCard'
 import { Category, Listing, configured, supabase } from '../lib/supabase'
 import { useSettings, waLink } from '../lib/settings'
 
+const STATIC = ['terrains', 'immobilier', 'automobiles']
 const CARDS = [
   { slug: 'terrains', icon: '🌍', t: 'Terrains', p: 'Découvrez des opportunités foncières.', b: 'Voir les terrains' },
   { slug: 'immobilier', icon: '🏠', t: 'Immobilier', p: 'Maisons, appartements, villas et locaux commerciaux.', b: 'Voir les biens immobiliers' },
@@ -47,7 +48,7 @@ export default function Home() {
           {CARDS.map((c) => (
             <Link key={c.slug} to={`/annonces?cat=${c.slug}`} className="cat">
               <div className="cimg">
-                {cats.find((x) => x.slug === c.slug)?.image_url ? <img src={cats.find((x) => x.slug === c.slug)!.image_url!} alt={c.t} loading="lazy" /> : <Art slug={c.slug} />}
+                {(() => { const u = cats.find((x) => x.slug === c.slug)?.image_url || (STATIC.includes(c.slug) ? `${import.meta.env.BASE_URL}categories/${c.slug}.webp` : null); return u ? <img src={u} alt={c.t} loading="lazy" /> : <Art slug={c.slug} /> })()}
                 <span className="ctag">{c.icon} {c.t}</span>
               </div>
               <div className="cbody"><p>{c.p}</p><span className="lnk">{c.b} →</span></div>
