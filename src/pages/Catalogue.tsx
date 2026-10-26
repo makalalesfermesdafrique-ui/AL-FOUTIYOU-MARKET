@@ -42,13 +42,13 @@ export default function Catalogue() {
       <main className="wrap">
         <div style={{ height: 18 }} />
         <div className="filters">
-          <input aria-label="Mot-clé" placeholder="Mot-clé" defaultValue={q} onBlur={(e) => set('q', e.target.value)} onKeyDown={(e) => e.key === 'Enter' && set('q', e.currentTarget.value)} />
+          <input aria-label="Mot-clé" placeholder="Mot-clé" key={q} defaultValue={q} onBlur={(e) => set('q', e.target.value)} onKeyDown={(e) => e.key === 'Enter' && set('q', e.currentTarget.value)} />
           <select aria-label="Catégorie" value={cat} onChange={(e) => set('cat', e.target.value)}>
             <option value="">Toutes les catégories</option>{cats.map((c) => <option key={c.id} value={c.slug}>{c.name}</option>)}
           </select>
-          <input aria-label="Ville" placeholder="Ville" defaultValue={city} onBlur={(e) => set('city', e.target.value)} />
-          <input aria-label="Région" placeholder="Région" defaultValue={region} onBlur={(e) => set('region', e.target.value)} />
-          <input aria-label="Budget maximum" type="number" min="0" placeholder="Budget max (FCFA)" defaultValue={max} onBlur={(e) => set('max', e.target.value)} />
+          <input aria-label="Ville" placeholder="Ville" key={city} defaultValue={city} onBlur={(e) => set('city', e.target.value)} />
+          <input aria-label="Région" placeholder="Région" key={region} defaultValue={region} onBlur={(e) => set('region', e.target.value)} />
+          <input aria-label="Budget maximum" type="number" min="0" placeholder="Budget max (FCFA)" key={max} defaultValue={max} onBlur={(e) => set('max', e.target.value)} />
           <select aria-label="Tri" value={sort} onChange={(e) => set('sort', e.target.value)}>
             <option value="desc">Plus récentes</option><option value="asc">Plus anciennes</option>
           </select>

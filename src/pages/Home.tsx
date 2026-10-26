@@ -34,7 +34,7 @@ export default function Home() {
           <p>Terrains, maisons et véhicules : découvrez les opportunités et contactez notre équipe pour organiser votre visite.</p>
           <div className="row2">
             <Link className="btn act" to="/annonces">Explorer les annonces</Link>
-            <a className="btn light" href="#contact">Proposer un bien</a>
+            <button className="btn light" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Proposer un bien</button>
           </div>
         </div>
       </section>
