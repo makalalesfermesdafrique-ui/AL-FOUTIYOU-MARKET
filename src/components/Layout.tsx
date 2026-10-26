@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useSettings, waLink } from '../lib/settings'
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -14,8 +14,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Link to="/" className="logo" onClick={close}>AL FOUTIYOU <b>MARKET</b></Link>
           <button className="burger" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>☰</button>
           <nav className={open ? 'open' : ''}>
-            <Link to="/" onClick={close}>Accueil</Link>
-            <Link to="/annonces" onClick={close}>Toutes les annonces</Link>
+            <NavLink end to="/" onClick={close}>Accueil</NavLink>
+            <NavLink end to="/annonces" onClick={close}>Annonces</NavLink>
             <Link to="/annonces?cat=terrains" onClick={close}>Terrains</Link>
             <Link to="/annonces?cat=immobilier" onClick={close}>Immobilier</Link>
             <Link to="/annonces?cat=automobiles" onClick={close}>Voitures</Link>

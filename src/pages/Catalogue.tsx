@@ -36,8 +36,11 @@ export default function Catalogue() {
 
   return (
     <Layout>
+      <section className="banner" style={{ backgroundImage: `linear-gradient(rgba(6,28,21,.75),rgba(6,28,21,.88)), url(${import.meta.env.BASE_URL}hero.jpg), linear-gradient(135deg,#0f3d2e,#0a2a20)` }}>
+        <h1 className="outline">Nos annonces</h1>
+      </section>
       <main className="wrap">
-        <h1 className="sec">Annonces</h1>
+        <div style={{ height: 18 }} />
         <div className="filters">
           <input aria-label="Mot-clé" placeholder="Mot-clé" defaultValue={q} onBlur={(e) => set('q', e.target.value)} onKeyDown={(e) => e.key === 'Enter' && set('q', e.currentTarget.value)} />
           <select aria-label="Catégorie" value={cat} onChange={(e) => set('cat', e.target.value)}>

@@ -28,9 +28,9 @@ export default function Home() {
 
   return (
     <Layout>
-      <section className="hero">
+      <section className="hero" style={{ backgroundImage: `linear-gradient(rgba(6,28,21,.72),rgba(6,28,21,.86)), url(${import.meta.env.BASE_URL}hero.jpg), linear-gradient(135deg,#0f3d2e,#0a2a20)` }}>
         <div className="wrap">
-          <h1>Trouvez votre prochain bien avec AL FOUTIYOU MARKET</h1>
+          <h1>Trouvez votre prochain bien avec <span className="outline">AL FOUTIYOU MARKET</span></h1>
           <p>Terrains, maisons et véhicules : découvrez les opportunités et contactez notre équipe pour organiser votre visite.</p>
           <div className="row2">
             <Link className="btn act" to="/annonces">Explorer les annonces</Link>
