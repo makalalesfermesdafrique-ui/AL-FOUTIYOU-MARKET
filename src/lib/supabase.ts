@@ -5,7 +5,7 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 export const configured = Boolean(url && key)
 export const supabase = createClient(url || 'https://placeholder.supabase.co', key || 'placeholder')
 
-export type Category = { id: number; slug: string; name: string }
+export type Category = { id: number; slug: string; name: string; image_url?: string | null }
 export type Listing = {
   id: string; title: string; description: string | null; category_id: number | null
   price: number | null; city: string | null; region: string | null; price_negotiable: boolean

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Bubbles from '../components/Bubbles'
+import Art from '../components/Art'
 import Layout from '../components/Layout'
 import ListingCard from '../components/ListingCard'
 import { Category, Listing, configured, supabase } from '../lib/supabase'
@@ -45,7 +46,11 @@ export default function Home() {
         <div className="cats">
           {CARDS.map((c) => (
             <Link key={c.slug} to={`/annonces?cat=${c.slug}`} className="cat">
-              <span className="ic">{c.icon}</span><h3>{c.t}</h3><p>{c.p}</p><span className="lnk">{c.b}</span>
+              <div className="cimg">
+                {cats.find((x) => x.slug === c.slug)?.image_url ? <img src={cats.find((x) => x.slug === c.slug)!.image_url!} alt={c.t} loading="lazy" /> : <Art slug={c.slug} />}
+                <span className="ctag">{c.icon} {c.t}</span>
+              </div>
+              <div className="cbody"><p>{c.p}</p><span className="lnk">{c.b} →</span></div>
             </Link>
           ))}
         </div>
