@@ -7,6 +7,8 @@ import Listings from './admin/Listings'
 import ListingForm from './admin/ListingForm'
 import Leads from './admin/Leads'
 import Settings from './admin/Settings'
+import Links from './admin/Links'
+import Submissions from './admin/Submissions'
 import Admins from './admin/Admins'
 
 type Prof = { role: string; active: boolean } | null
@@ -72,7 +74,9 @@ export default function Admin() {
         <NavLink end to="/admin" onClick={close}>Tableau de bord</NavLink>
         <NavLink to="/admin/annonces" onClick={close}>Annonces</NavLink>
         <NavLink to="/admin/annonces/nouveau" onClick={close}>Ajouter un bien</NavLink>
-        <NavLink to="/admin/demandes" onClick={close}>Demandes</NavLink>
+        <NavLink to="/admin/propositions" onClick={close}>Propositions reçues</NavLink>
+        <NavLink to="/admin/liens" onClick={close}>Liens de formulaires</NavLink>
+        <NavLink to="/admin/demandes" onClick={close}>Demandes clients</NavLink>
         <NavLink to="/admin/parametres" onClick={close}>Paramètres</NavLink>
         {isSuper && <NavLink to="/admin/admins" onClick={close}>Administrateurs</NavLink>}
         <Link to="/" onClick={close}>Voir le site</Link>
@@ -85,6 +89,8 @@ export default function Admin() {
           <Route path="annonces" element={<Listings />} />
           <Route path="annonces/nouveau" element={<ListingForm />} />
           <Route path="annonces/:id" element={<ListingForm />} />
+          <Route path="propositions" element={<Submissions />} />
+          <Route path="liens" element={<Links />} />
           <Route path="demandes" element={<Leads />} />
           <Route path="parametres" element={<Settings />} />
           {isSuper && <Route path="admins" element={<Admins me={session.user.id} />} />}

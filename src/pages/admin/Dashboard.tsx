@@ -20,6 +20,8 @@ export default function Dashboard() {
       }
       const l = await supabase.from('customer_leads').select('id', { count: 'exact', head: true })
       const nl = await supabase.from('customer_leads').select('id', { count: 'exact', head: true }).eq('status', 'new')
+      const ps = await supabase.from('owner_submissions').select('id', { count: 'exact', head: true }).eq('status', 'new')
+      out['Propositions à examiner'] = ps.count ?? 0
       out['Demandes reçues'] = l.count ?? 0
       out['Nouvelles demandes'] = nl.count ?? 0
       setN(out)
