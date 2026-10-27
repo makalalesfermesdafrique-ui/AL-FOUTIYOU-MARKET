@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import { ICON, Listing, fcfa, supabase } from '../lib/supabase'
+import { allLabel, val } from '../lib/fields'
 import { pubUrl } from '../lib/images'
 import { useSettings, waLink } from '../lib/settings'
 
@@ -59,6 +60,15 @@ export default function Detail() {
         <p className="price big">{fcfa(l.price)}{l.price_negotiable && l.price != null && <small> · négociable</small>}</p>
         {l.published_at && <p className="mut">Publiée le {new Date(l.published_at).toLocaleDateString('fr-FR')}</p>}
         <p className="desc">{l.description || 'Aucune description détaillée pour le moment.'}</p>
+        {!!Object.keys(l.details ?? {}).length && (
+          <section className="info">
+            <h2>Informations pour l'acheteur</h2>
+            <dl>{Object.entries(l.details!).filter(([k]) => k !== 'documents' && k !== 'observations').map(([k, x]) => <div key={k}><dt>{allLabel(k)}</dt><dd>{val(x)}</dd></div>)}</dl>
+            {!!l.details!.documents?.length && <><h3>Documents administratifs déclarés</h3><ul className="docs">{(l.details!.documents as string[]).map((d) => <li key={d}>✓ {d}</li>)}</ul></>}
+            {l.details!.observations && <p className="desc">{l.details!.observations}</p>}
+            <p className="mut">Informations déclarées par le propriétaire. AL FOUTIYOU MARKET les vérifie avec lui avant toute vente : demandez-nous de voir les documents lors de la visite.</p>
+          </section>
+        )}
         <div className="row2">
           {wa && <a className="btn wa" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
           {navigator.share && <button className="btn ghost" onClick={() => navigator.share({ title: l.title, url: location.href })}>Partager</button>}

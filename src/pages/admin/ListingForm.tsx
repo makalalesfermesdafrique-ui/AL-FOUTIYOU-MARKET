@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Category, supabase } from '../../lib/supabase'
+import Fields from '../../components/Fields'
+import { fieldsFor, pubDetails } from '../../lib/fields'
 import Photos, { Item } from '../../components/Photos'
 import { pubUrl, uid, upload } from '../../lib/images'
 
@@ -14,10 +16,12 @@ export default function ListingForm() {
   const [items, setItems] = useState<Item[]>([])
   const [removed, setRemoved] = useState<{ id: string; path: string; thumb: string | null }[]>([])
   const [prog, setProg] = useState('')
+  const [det, setDet] = useState<Record<string, any>>({})
+  const slug = cats.find((c) => String(c.id) === String(v.category_id))?.slug ?? ''
   useEffect(() => {
     supabase.from('categories').select('*').order('id').then(({ data }) => setCats(data ?? []))
     if (id) supabase.from('listing_images').select('*').eq('listing_id', id).order('sort_order').then(({ data }) => setItems((data ?? []).map((r: any) => ({ key: r.id, preview: pubUrl(r.thumbnail_path ?? r.storage_path), saved: { id: r.id, path: r.storage_path, thumb: r.thumbnail_path } }))))
-    if (id) supabase.from('listings').select('*').eq('id', id).maybeSingle().then(({ data }) => data && setV({ ...data, price: data.price ?? '', image_url: data.image_url ?? '', city: data.city ?? '', region: data.region ?? '', description: data.description ?? '' }))
+    if (id) supabase.from('listings').select('*').eq('id', id).maybeSingle().then(({ data }) => data && (setDet(data.details ?? {}), setV({ ...data, price: data.price ?? '', image_url: data.image_url ?? '', city: data.city ?? '', region: data.region ?? '', description: data.description ?? '' })))
   }, [id])
   const on = (k: string) => (e: any) => setV({ ...v, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
 
@@ -25,7 +29,7 @@ export default function ListingForm() {
     if (!v.title.trim() || !v.category_id) return setMsg({ ok: false, t: 'Le titre et la catégorie sont obligatoires.' })
     setBusy(true); setMsg(null)
     const row: any = { title: v.title.trim(), description: v.description || null, category_id: Number(v.category_id), city: v.city || null, region: v.region || null,
-      price: v.price === '' ? null : Number(v.price), price_negotiable: v.price_negotiable, status, updated_at: new Date().toISOString() }
+      price: v.price === '' ? null : Number(v.price), price_negotiable: v.price_negotiable, details: pubDetails(slug, det), status, updated_at: new Date().toISOString() }
     try {
       let lid = id
       if (id) { const { error } = await supabase.from('listings').update(row).eq('id', id); if (error) throw error }
@@ -70,6 +74,7 @@ export default function ListingForm() {
         <label>Région<input value={v.region} onChange={on('region')} /></label>
         <label>Prix (FCFA), facultatif<input type="number" min="0" value={v.price} onChange={on('price')} /></label>
         <label className="chk"><input type="checkbox" checked={v.price_negotiable} onChange={on('price_negotiable')} /> Prix négociable</label>
+        {slug && <><h3>Dossier administratif et caractéristiques (visibles par les clients)</h3><Fields fields={fieldsFor(slug).filter((f) => f.pub)} v={det} set={(k, x) => setDet({ ...det, [k]: x })} /></>}
         <label>Photos du bien</label>
         <Photos items={items} setItems={(n) => { setRemoved([...removed, ...items.filter((i) => i.saved && !n.some((x) => x.key === i.key)).map((i) => i.saved!)]); setItems(n) }} />
         {msg && <p className={msg.ok ? 'ok' : 'warn'}>{msg.t}</p>}
