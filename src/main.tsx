@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Catalogue from './pages/Catalogue'
 import Detail from './pages/Detail'
 import Proposer from './pages/Proposer'
+import Legal from './pages/Legal'
 import Admin from './pages/Admin'
 import './style.css'
 
@@ -18,6 +19,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/annonces" element={<Catalogue />} />
         <Route path="/annonce/:id" element={<Detail />} />
         <Route path="/proposer/:token" element={<ProposerRoute />} />
+        <Route path="/conditions" element={<Legal kind="terms" />} />
+        <Route path="/confidentialite" element={<Legal kind="privacy" />} />
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
     </HashRouter>

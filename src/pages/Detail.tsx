@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Layout from '../components/Layout'
-import { ICON, Listing, fcfa, supabase } from '../lib/supabase'
-import { allLabel, val } from '../lib/fields'
+import { ICON, Listing, supabase } from '../lib/supabase'
+import ListingBody from '../components/ListingBody'
 import { pubUrl } from '../lib/images'
 import { useSettings, waLink } from '../lib/settings'
 
@@ -15,7 +15,6 @@ export default function Detail() {
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [imgs, setImgs] = useState<string[]>([])
-  const [cur, setCur] = useState(0)
 
   useEffect(() => {
     supabase.from('public_listings').select('*').eq('id', id).maybeSingle().then(async ({ data, error }) => {
@@ -51,24 +50,7 @@ export default function Detail() {
     <Layout>
       <main className="wrap detail">
         <p><Link to="/annonces">← Toutes les annonces</Link></p>
-        <div className="ph big">{(imgs[cur] ?? l.image_url) ? <img src={imgs[cur] ?? l.image_url!} alt={`${l.title} – photo ${cur + 1}`} /> : <span>{ICON[slug] ?? '📦'}</span>}
-          {imgs.length > 1 && <><button className="nv l" aria-label="Photo précédente" onClick={() => setCur((cur + imgs.length - 1) % imgs.length)}>◀</button><button className="nv r" aria-label="Photo suivante" onClick={() => setCur((cur + 1) % imgs.length)}>▶</button></>}
-        </div>
-        {imgs.length > 1 && <div className="strip">{imgs.map((u, i) => <img key={u} src={u} alt={`Miniature ${i + 1}`} className={i === cur ? 'on' : ''} onClick={() => setCur(i)} loading="lazy" />)}</div>}
-        <h1>{l.title}</h1>
-        <p className="loc">📍 {[l.city, l.region].filter(Boolean).join(', ') || 'Localité à préciser'}</p>
-        <p className="price big">{fcfa(l.price)}{l.price_negotiable && l.price != null && <small> · négociable</small>}</p>
-        {l.published_at && <p className="mut">Publiée le {new Date(l.published_at).toLocaleDateString('fr-FR')}</p>}
-        <p className="desc">{l.description || 'Aucune description détaillée pour le moment.'}</p>
-        {!!Object.keys(l.details ?? {}).length && (
-          <section className="info">
-            <h2>Informations pour l'acheteur</h2>
-            <dl>{Object.entries(l.details!).filter(([k]) => k !== 'documents' && k !== 'observations').map(([k, x]) => <div key={k}><dt>{allLabel(k)}</dt><dd>{val(x)}</dd></div>)}</dl>
-            {!!l.details!.documents?.length && <><h3>Documents administratifs déclarés</h3><ul className="docs">{(l.details!.documents as string[]).map((d) => <li key={d}>✓ {d}</li>)}</ul></>}
-            {l.details!.observations && <p className="desc">{l.details!.observations}</p>}
-            <p className="mut">Informations déclarées par le propriétaire. AL FOUTIYOU MARKET les vérifie avec lui avant toute vente : demandez-nous de voir les documents lors de la visite.</p>
-          </section>
-        )}
+        <ListingBody l={l} imgs={imgs} icon={ICON[slug] ?? '📦'} />
         <div className="row2">
           {wa && <a className="btn wa" href={wa} target="_blank" rel="noreferrer">💬 WhatsApp</a>}
           {navigator.share && <button className="btn ghost" onClick={() => navigator.share({ title: l.title, url: location.href })}>Partager</button>}

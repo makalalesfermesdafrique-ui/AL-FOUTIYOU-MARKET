@@ -34,6 +34,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           {s.phone && <p>📞 <a href={`tel:${s.phone}`}>{s.phone}</a></p>}
           {s.email && <p>✉️ <a href={`mailto:${s.email}`}>{s.email}</a></p>}
           {s.address && <p>📍 {s.address}</p>}
+          <p><Link to="/conditions">Conditions d'utilisation</Link> · <Link to="/confidentialite">Politique de confidentialité</Link></p>
           <p><Link to="/admin">Espace administrateur</Link></p>
         </div>
       </footer>

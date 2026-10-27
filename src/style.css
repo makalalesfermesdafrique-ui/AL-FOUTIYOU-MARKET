@@ -123,3 +123,6 @@ h1,h2,h3,.logo,.stat b{font-family:Montserrat,Inter,sans-serif;font-weight:800;l
 .info{background:#fff;border-radius:16px;padding:18px 20px;margin:12px 0;border-left:5px solid var(--g2)}.info h2{margin:0 0 10px}
 .info dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0 0 10px}.info dt{font:600 .9rem 'Barlow Condensed',Inter;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}.info dd{margin:0;font-weight:700}
 .docs{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-wrap:wrap;gap:8px}.docs li{background:#e5f3ea;color:#015a2b;font-weight:700;padding:6px 12px;border-radius:999px}
+.legal article p{white-space:pre-line;max-width:75ch;background:#fff;padding:14px 18px;border-radius:12px;margin:0 0 10px}
+.modal{overflow:auto;align-items:start;padding:20px 12px}.prevbox{background:var(--sky);border-radius:16px;padding:16px;width:min(760px,96%);margin:auto}
+.foot p a{color:var(--gold)}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Category, supabase } from '../../lib/supabase'
+import ListingBody from '../../components/ListingBody'
+import { ICON } from '../../lib/supabase'
 import Fields from '../../components/Fields'
 import { fieldsFor, pubDetails } from '../../lib/fields'
 import Photos, { Item } from '../../components/Photos'
@@ -16,6 +18,7 @@ export default function ListingForm() {
   const [items, setItems] = useState<Item[]>([])
   const [removed, setRemoved] = useState<{ id: string; path: string; thumb: string | null }[]>([])
   const [prog, setProg] = useState('')
+  const [prev, setPrev] = useState(false)
   const [det, setDet] = useState<Record<string, any>>({})
   const slug = cats.find((c) => String(c.id) === String(v.category_id))?.slug ?? ''
   useEffect(() => {
@@ -81,9 +84,20 @@ export default function ListingForm() {
         <div className="row2">
           <button className="ghost" disabled={busy} onClick={() => save(v.status === 'published' ? 'draft' : v.status)}>Enregistrer sans publier</button>
           <button className="btn act" disabled={busy} onClick={() => save('published')}>{busy ? prog || 'Enregistrement…' : 'Publier'}</button>
+          <button className="ghost" onClick={() => setPrev(true)}>👁 Aperçu</button>
           <button className="ghost" onClick={() => nav('/admin/annonces')}>Annuler</button>
         </div>
       </div>
+      {prev && (
+        <div className="modal" onClick={() => setPrev(false)}>
+          <div className="prevbox detail" onClick={(e) => e.stopPropagation()}>
+            <div className="bar"><b>Aperçu : voici ce que verront les clients</b><button className="ghost sm" onClick={() => setPrev(false)}>Fermer</button></div>
+            <ListingBody icon={ICON[slug] ?? '📦'} imgs={items.map((i) => i.preview)}
+              l={{ id: 'apercu', title: v.title || 'Titre de l’annonce', description: v.description, category_id: Number(v.category_id) || null, price: v.price === '' ? null : Number(v.price), city: v.city, region: v.region,
+                price_negotiable: v.price_negotiable, image_url: null, details: pubDetails(slug, det), published_at: null, created_at: '' }} />
+          </div>
+        </div>
+      )}
     </>
   )
 }
