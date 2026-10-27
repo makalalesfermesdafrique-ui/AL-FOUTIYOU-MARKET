@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="ticker"><div className="track">{[...MSG, ...MSG].map((m, i) => <span key={i}>{m}</span>)}</div></div>
       <header className="top">
         <div className="wrap nav">
-          <Link to="/" className="logo" onClick={close}>AL FOUTIYOU <b>MARKET</b></Link>
+          <Link to="/" className="logo" onClick={close}><span className="wm"><b>AL FOUTIYOU</b><i>MARKET</i></span></Link>
           <button className="burger" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>☰</button>
           <nav className={open ? 'open' : ''}>
             <NavLink end to="/" onClick={close}>Accueil</NavLink>

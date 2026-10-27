@@ -34,7 +34,7 @@ export default function Home() {
       <section className="hero" style={{ backgroundImage: `linear-gradient(rgba(6,28,21,.72),rgba(6,28,21,.86)), url(${import.meta.env.BASE_URL}hero.jpg), linear-gradient(135deg,#0f3d2e,#0a2a20)` }}>
         <Bubbles />
         <div className="wrap">
-          <h1>Trouvez votre prochain bien avec <span className="outline">AL FOUTIYOU MARKET</span></h1>
+          <h1>Trouvez votre prochain bien avec <span className="brand">AL FOUTIYOU <em>MARKET</em></span></h1>
           <p>Terrains, maisons et véhicules : découvrez les opportunités et contactez notre équipe pour organiser votre visite.</p>
           <div className="row2">
             <Link className="btn act" to="/annonces">Explorer les annonces</Link>
@@ -66,18 +66,40 @@ export default function Home() {
         {!!items.length && <p className="center"><Link className="btn" to="/annonces">Voir toutes les annonces</Link></p>}
 
         <h2 className="sec">Pourquoi choisir AL FOUTIYOU MARKET ?</h2>
-        <div className="three">
-          <div><h3>Mise en relation de confiance</h3><p>Notre équipe examine chaque bien avant publication.</p></div>
-          <div><h3>Un seul interlocuteur</h3><p>Vous nous contactez, nous organisons la visite avec le propriétaire.</p></div>
-          <div><h3>Simple depuis votre téléphone</h3><p>Consultez, filtrez et écrivez-nous sans créer de compte.</p></div>
+        <p className="lead">Acheter un terrain, une maison ou un véhicule est une décision importante. Nous vous aidons à la prendre avec des informations claires et un interlocuteur unique.</p>
+        <div className="why">
+          {[
+            ['Des biens examinés avant publication', "Aucun bien n'est publié automatiquement. Notre équipe échange avec le propriétaire, relit les informations transmises et décide de la mise en ligne."],
+            ['Un dossier clair avant même la visite', "Chaque fiche présente le prix, les caractéristiques et les documents administratifs déclarés par le propriétaire : titre foncier, bail, délibération, carte grise, certificat de non-gage…"],
+            ['Des points de vigilance annoncés', "Statut foncier, hypothèque, litige éventuel, occupation du bien : ces renseignements essentiels sont indiqués pour que vous sachiez à quoi vous attendre."],
+            ['Un seul interlocuteur', "Vous n'avez pas à chercher le propriétaire : vous nous contactez, nous vous répondons et organisons la rencontre à votre rythme."],
+            ['Des prix affichés en toute transparence', "Le prix demandé est indiqué en francs CFA, avec la mention « négociable » lorsque le propriétaire est ouvert à la discussion."],
+            ['Simple, depuis votre téléphone', "Consultez les annonces, filtrez par ville ou par budget et écrivez-nous sur WhatsApp ou par formulaire, sans créer de compte."],
+          ].map(([t, d], i) => <article key={t} className="wy"><span className="n">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{d}</p></article>)}
         </div>
+
         <h2 className="sec">Comment fonctionne notre service ?</h2>
-        <ol className="steps">
-          <li>Vous parcourez les annonces publiées.</li>
-          <li>Vous nous envoyez une demande de renseignements.</li>
-          <li>Nous vous recontactons et organisons la visite.</li>
-          <li>Nous facilitons les échanges jusqu'à la vente.</li>
+        <p className="lead">De la première recherche à la conclusion de la vente, nous restons à vos côtés. Le site présente les biens et facilite les échanges : la vente elle-même se conclut avec le propriétaire, avec notre accompagnement.</p>
+        <ol className="tl">
+          {[
+            ['Explorez les annonces', 'Choisissez une catégorie, puis affinez par ville, région ou budget maximum.'],
+            ['Étudiez le dossier du bien', "Photos, prix, caractéristiques et documents administratifs déclarés : tout est sur la fiche."],
+            ['Contactez-nous', 'Envoyez une demande de renseignements ou écrivez-nous sur WhatsApp, sans inscription.'],
+            ['Visitez le bien', 'Nous vous recontactons, fixons un rendez-vous avec le propriétaire et vous accompagnons si besoin.'],
+            ['Concluez la vente', "Nous facilitons les échanges et la négociation. Demandez à consulter les documents originaux avant de vous engager."],
+          ].map(([t, d]) => <li key={t}><h3>{t}</h3><p>{d}</p></li>)}
         </ol>
+
+        <h2 className="sec">Vous avez un bien à vendre ?</h2>
+        <p className="lead">Proposez-le sans créer de compte. Notre équipe vous accompagne à chaque étape.</p>
+        <div className="own">
+          {[
+            ['Prenez contact', 'Écrivez-nous ou appelez-nous pour nous présenter votre bien.'],
+            ['Remplissez votre fiche', "Nous vous envoyons un lien sécurisé : prix, documents disponibles, caractéristiques et photos."],
+            ['Nous examinons', "Nous vérifions les informations avec vous et vous recontactons avant toute publication."],
+            ['Votre annonce est publiée', 'Une fois validée, elle est visible par les acheteurs, et nous gérons les demandes et les visites.'],
+          ].map(([t, d], i) => <div key={t}><b>{i + 1}</b><h3>{t}</h3><p>{d}</p></div>)}
+        </div>
         <section id="contact" className="cta"><Bubbles />
           <h2>Contacter AL FOUTIYOU MARKET</h2>
           <p>Pour proposer un bien ou obtenir un renseignement.</p>
