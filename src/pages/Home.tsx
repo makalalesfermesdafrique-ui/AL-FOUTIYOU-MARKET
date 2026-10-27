@@ -7,7 +7,7 @@ import ListingCard from '../components/ListingCard'
 import { Category, Listing, configured, supabase } from '../lib/supabase'
 import { useSettings, waLink } from '../lib/settings'
 
-const STATIC = ['terrains', 'immobilier', 'automobiles']
+const STATIC = ['terrains', 'immobilier', 'automobiles', 'motos']
 const CARDS = [
   { slug: 'terrains', icon: '🌍', t: 'Terrains', p: 'Découvrez des opportunités foncières.', b: 'Voir les terrains' },
   { slug: 'immobilier', icon: '🏠', t: 'Immobilier', p: 'Maisons, appartements, villas et locaux commerciaux.', b: 'Voir les biens immobiliers' },
